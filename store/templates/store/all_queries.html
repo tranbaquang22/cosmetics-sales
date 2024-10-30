@@ -1,0 +1,70 @@
+{% extends 'store/base.html' %}
+{% block title %}All Queries{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">All Queries</h2>
+    <table class="table table-bordered table-striped">
+        <thead class="table-primary">
+            <tr>
+                <th>Query Description</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Total Products</td>
+                <td>{{ queries.total_products }}</td>
+            </tr>
+            <tr>
+                <td>Total Orders</td>
+                <td>{{ queries.total_orders }}</td>
+            </tr>
+            <tr>
+                <td>Average Product Price</td>
+                <td>${{ queries.average_price|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td>Maximum Product Price</td>
+                <td>${{ queries.max_price }}</td>
+            </tr>
+            <tr>
+                <td>Minimum Product Price</td>
+                <td>${{ queries.min_price }}</td>
+            </tr>
+            <tr>
+                <td>Total Categories</td>
+                <td>{{ queries.category_count }}</td>
+            </tr>
+            <tr>
+                <td>Products per Category</td>
+                <td>
+                    <ul>
+                        {% for category in queries.products_per_category %}
+                            <li>{{ category.category__name }}: {{ category.total }} products</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Orders per Status</td>
+                <td>
+                    <ul>
+                        {% for status in queries.orders_per_status %}
+                            <li>{{ status.status }}: {{ status.total }} orders</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Most Expensive Product</td>
+                <td>{{ queries.most_expensive_product.name }}: ${{ queries.most_expensive_product.price }}</td>
+            </tr>
+            <tr>
+                <td>Least Stocked Product</td>
+                <td>{{ queries.least_stocked_product.name }}: {{ queries.least_stocked_product.stock }} in stock</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
