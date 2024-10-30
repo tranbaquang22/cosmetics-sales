@@ -1,0 +1,55 @@
+{% extends 'store/base.html' %}
+{% block title %}Order Detail{% endblock %}
+{% load multiplication %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Nút Back to Order List nằm dưới thanh navbar, góc trái -->
+    <div class="row">
+        <div class="col-md-12">
+            <a href="{% url 'order_list' %}" class="btn btn-primary btn-lg" style="font-size: 1.5rem; margin-top: 1rem; position: absolute; top: 100px; left: 20px;">
+                Back to Order List
+            </a>
+        </div>
+    </div>
+
+    <!-- Phần chi tiết đơn hàng hiển thị gần navbar, căn trái và sắp xếp cách đều -->
+    <div class="row" style="margin-top: 60px;">
+        <div class="col-md-6" style="font-size: 1.3rem; line-height: 2.5rem;">
+            <h1 class="display-4 mb-3">Order Detail - ID {{ order.id }}</h1>
+            <p><strong>Customer Name:</strong> {{ order.customer_name }}</p>
+            <p><strong>Customer Address:</strong> {{ order.customer_address }}</p>
+            <p><strong>Customer Phone:</strong> {{ order.customer_phone }}</p>
+            <p><strong>Order Date:</strong> {{ order.date_ordered }}</p>
+            <p><strong>Status:</strong> {{ order.status }}</p>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách sản phẩm trong đơn hàng, căn giữa và sắp xếp đồng nhất với tiêu đề -->
+    <div class="row" style="margin-top: 0px;">
+        <div class="col-md-6" style="font-size: 1.3rem; line-height: 2.5rem;">
+            <h1 class="display-4 text-left">Order Items</h1>
+            <table class="table table-bordered mt-3" style="font-size: 1.3rem;">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.orderdetail_set.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.price }}</td>
+                        <td>${{ item.quantity|multiply:item.price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
