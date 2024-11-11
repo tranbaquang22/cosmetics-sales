@@ -4,10 +4,8 @@
 
 {% block content %}
 <div class="container mt-5">
-    <!-- Tiêu đề trung tâm và màu sắc chính -->
     <h2 class="text-center text-dark mb-4">Stored Procedures</h2>
     
-    <!-- Hiển thị thông báo thành công/thất bại -->
     {% if messages %}
         <div class="alert-messages">
             {% for message in messages %}
@@ -39,10 +37,10 @@
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <select name="supplier_id" class="form-select" required>
-                        <option value="" disabled selected>Select Supplier</option>
-                        {% for supplier in suppliers %}
-                            <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                    <select name="brand_id" class="form-select" required>
+                        <option value="" disabled selected>Select Brand</option>
+                        {% for brand in brands %}
+                            <option value="{{ brand.id }}">{{ brand.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -53,6 +51,15 @@
                     <input type="number" name="stock" class="form-control" placeholder="Stock" required>
                 </div>
                 <div class="col-md-6">
+                    <select name="skin_type" class="form-select" required>
+                        <option value="" disabled selected>Select Skin Type</option>
+                        <option value="Dry">Dry</option>
+                        <option value="Oily">Oily</option>
+                        <option value="Combination">Combination</option>
+                        <option value="Sensitive">Sensitive</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
                     <input type="text" name="description" class="form-control" placeholder="Description">
                 </div>
                 <div class="col-md-12">

@@ -1,8 +1,9 @@
 from django.db import connection
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Order, Category, Supplier
+from .models import Product, Order, Category, Brand, OrderDetail
 from django.db.models import Avg, Max, Min, Count
 from django.contrib import messages
+
 def product_list(request):
     products = Product.objects.all()
     categories = Category.objects.all()
@@ -29,9 +30,8 @@ def category_products(request, category_id):
     categories = Category.objects.all()
     return render(request, 'store/category_products.html', {'products': products, 'category': category, 'categories': categories})
 
-# View mới để hiển thị tất cả các truy vấn
+# View để hiển thị tất cả các truy vấn
 def all_queries(request):
-    # Các truy vấn mẫu
     queries = {
         'total_products': Product.objects.count(),
         'total_orders': Order.objects.count(),
@@ -48,7 +48,6 @@ def all_queries(request):
     categories = Category.objects.all()
     return render(request, 'store/all_queries.html', {'queries': queries, 'categories': categories})
 
-
 def call_stored_procedure(procedure_name, params):
     """Utility function to call an Oracle stored procedure using Django's managed connection."""
     with connection.cursor() as cursor:
@@ -62,23 +61,24 @@ def call_stored_procedure(procedure_name, params):
 def execute_add_product(request):
     if request.method == 'POST':
         category_id = int(request.POST.get('category_id', 1))
-        supplier_id = int(request.POST.get('supplier_id', 1))
+        brand_id = int(request.POST.get('brand_id', 1))
 
-        # Kiểm tra sự tồn tại của category_id và supplier_id
+        # Kiểm tra sự tồn tại của category_id và brand_id
         if not Category.objects.filter(id=category_id).exists():
-            messages.error(request, 'Lỗi: Category không tồn tại.')
+            messages.error(request, 'Lỗi: Danh mục không tồn tại.')
             return redirect('stored_procedures')
 
-        if not Supplier.objects.filter(id=supplier_id).exists():
-            messages.error(request, 'Lỗi: Supplier không tồn tại.')
+        if not Brand.objects.filter(id=brand_id).exists():
+            messages.error(request, 'Lỗi: Thương hiệu không tồn tại.')
             return redirect('stored_procedures')
 
         params = [
             request.POST.get('name', 'Sample Product'),
             category_id,
-            supplier_id,
+            brand_id,
             float(request.POST.get('price', 100.0)),
             int(request.POST.get('stock', 50)),
+            request.POST.get('skin_type', 'All'),
             request.POST.get('description', 'Sample Description'),
             request.POST.get('image', 'default.jpg')
         ]
@@ -88,7 +88,7 @@ def execute_add_product(request):
             messages.success(request, 'Thêm sản phẩm thành công!')
         except Exception as e:
             if 'ORA-02291' in str(e):
-                messages.error(request, 'Lỗi: Không tìm thấy khóa ngoại hợp lệ (Category hoặc Supplier).')
+                messages.error(request, 'Lỗi: Không tìm thấy khóa ngoại hợp lệ (Danh mục hoặc Thương hiệu).')
             else:
                 messages.error(request, f'Lỗi: {str(e)}')
     return redirect('stored_procedures')
@@ -126,15 +126,6 @@ def execute_update_stock(request):
         except Exception as e:
             messages.error(request, f'Lỗi: {str(e)}')
     return redirect('stored_procedures')
-def execute_delete_product(request):
-    if request.method == 'POST':
-        params = [int(request.POST.get('product_id', 1))]
-        try:
-            call_stored_procedure('DELETE_PRODUCT_PROC', params)
-            messages.success(request, 'Xóa sản phẩm thành công!')
-        except Exception as e:
-            messages.error(request, f'Lỗi: {str(e)}')
-    return redirect('stored_procedures')
 
 def execute_add_order_detail(request):
     if request.method == 'POST':
@@ -150,15 +141,16 @@ def execute_add_order_detail(request):
         except Exception as e:
             messages.error(request, f'Lỗi: {str(e)}')
     return redirect('stored_procedures')
+
 def stored_procedures(request):
-    # Lấy danh sách các danh mục, nhà cung cấp, sản phẩm, và đơn hàng
+    # Lấy danh sách các danh mục, thương hiệu, sản phẩm, và đơn hàng
     categories = Category.objects.all()
-    suppliers = Supplier.objects.all()
+    brands = Brand.objects.all()
     products = Product.objects.all()
     orders = Order.objects.all()
     return render(request, 'store/stored_procedures.html', {
         'categories': categories,
-        'suppliers': suppliers,
+        'brands': brands,
         'products': products,
         'orders': orders,
     })
